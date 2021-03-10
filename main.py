@@ -20,9 +20,10 @@ if html.strip():
         if card.find('a') is not None:
             sale_price = card.find('a').contents
             for price in sale_price:
-                prices.append(price.strip())
-print(prices)
+                prices.append(int(price.replace(',','').replace("'", '').replace('$', '').strip()))
 
+df = pandas.DataFrame(data={"Sale Price": prices})
+df.to_csv("./file.csv", sep=',',index=False)
 # output_notebook()
 
 # p = figure(plot_width=400,plot_height=400)
