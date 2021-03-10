@@ -6,13 +6,15 @@ name = "pypi"
 [packages]
 bokeh = "*"
 requests = "*"
-bs4 = "*"
 pandas = "*"
+pylint = "*"
+beautifulsoup4 = "*"
+openpyxl = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.8.5"
+python_version = "3.9"
 
 [scripts]
 start="pipenv run python main.py"
