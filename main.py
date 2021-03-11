@@ -23,6 +23,7 @@ if html.strip():
     pending = []
     beds = []
     baths = []
+    ft = []
     address = []
     links = []
     for card in soup.find_all('div', {'class': ['infinite-item', 'property-card']}):
@@ -44,6 +45,9 @@ if html.strip():
             # of baths
             num_baths = card.find('div', {'class':'property-baths'}).contents[1].contents[0]
             baths.append(int(num_baths))
+            # sq ft
+            size = card.find('div', {'class':'property-sqft'}).contents[1].contents[0]
+            ft.append(int(size.replace(",", '')))
             # add address
             where = card.find('div',{'class':'property-address'}).contents[0].strip()
             where += ', ' + card.find('div',{'class':'property-city'}).contents[0].strip()
@@ -62,6 +66,7 @@ df = pandas.DataFrame(data={
     "Sale Pending":pending,
     "Beds": beds,
     "Baths": baths,
+    "Ft": ft,
     "Address":address,
     "Url": links})
 df.to_csv("./file.csv", sep=',',index=False)
