@@ -71,9 +71,9 @@ df = pandas.DataFrame(data={
     "Ft": ft,
     "Address":address,
     "Url": links})
-df.sort_values(by="Sale Pending", inplace=True)
 df.to_csv("./file.csv", sep=',',index=False)
 df["Url"] = xl_links
+df.sort_values(by="Sale Pending", inplace=True)
 df.to_excel("./sheet.xlsx",index=False)
 send_email()
 
