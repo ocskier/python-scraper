@@ -8,6 +8,8 @@ from bs4 import BeautifulSoup
 from requests.exceptions import RequestException
 # from bokeh.plotting import figure, output_notebook, show
 
+from utils.mailer import send_email
+
 try:
     URL = "https://www.century21.com/real-estate/raleigh-nc-27613/LZ27613/"
     URL += "?sn=5&sk=Y&pt=1%2C4%2C5&sf=3000&o=price-asc"
@@ -69,9 +71,11 @@ df = pandas.DataFrame(data={
     "Ft": ft,
     "Address":address,
     "Url": links})
+df.sort_values(by="Sale Pending", inplace=True)
 df.to_csv("./file.csv", sep=',',index=False)
 df["Url"] = xl_links
 df.to_excel("./sheet.xlsx",index=False)
+send_email()
 
 # output_notebook()
 
