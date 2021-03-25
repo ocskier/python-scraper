@@ -1,4 +1,4 @@
-""" This is a module for email real estate local data"""
+""" This is a module to email real estate local data"""
 import smtplib
 import ssl
 import  os
