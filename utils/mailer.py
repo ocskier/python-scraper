@@ -1,7 +1,7 @@
 """ This is a module to email real estate local data"""
 import smtplib
 import ssl
-import  os
+import os
 from email.encoders import encode_base64
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
