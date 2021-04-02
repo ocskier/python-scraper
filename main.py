@@ -6,79 +6,84 @@ import pandas
 import requests
 from bs4 import BeautifulSoup
 from requests.exceptions import RequestException
+from time import sleep
 # from bokeh.plotting import figure, output_notebook, show
 
 from utils.mailer import send_email
 
-try:
-    URL = "https://www.century21.com/real-estate/raleigh-nc-27613/LZ27613/"
-    URL += "?sn=5&sk=Y&pt=1%2C4%2C5&sf=3000&o=price-asc"
-    response = requests.get(URL)
-    html = response.text
+def runScrape():
+    try:
+        URL = "https://www.century21.com/real-estate/raleigh-nc-27613/LZ27613/"
+        URL += "?sn=5&sk=Y&pt=1%2C4%2C5&sf=3000&o=price-asc"
+        response = requests.get(URL)
+        html = response.text
 
-except RequestException as _e:
-    print(_e)
+    except RequestException as _e:
+        print(_e)
 
-if html.strip():
-    soup = BeautifulSoup(html, features="html.parser")
-    prices = []
-    pending = []
-    beds = []
-    baths = []
-    ft = []
-    address = []
-    links = []
-    for card in soup.find_all('div', {'class': ['infinite-item', 'property-card']}):
-        if card.find('div',{'class':'property-address'}) is not None:
-            # add price
-            sale_price = card.find('a').contents[0]
-            prices.append(int(
-                sale_price.replace(',','').replace("'", '').replace('$', '').strip())
-            )
-            # add if avail
-            if card.find('div', {'class':'sale-pending'}) is not None:
-                sale_pending = card.find('div', {'class':'sale-pending'}).contents[0]
-                pending.append(True)
-            else:
-                pending.append(False)
-            # of beds
-            num_beds = card.find('div', {'class':'property-beds'}).contents[1].contents[0]
-            beds.append(int(num_beds))
-            # of baths
-            num_baths = card.find('div', {'class':'property-baths'}).contents[1].contents[0]
-            baths.append(int(num_baths))
-            # sq ft
-            size = card.find('div', {'class':'property-sqft'}).contents[1].contents[0]
-            ft.append(int(size.replace(",", '')))
-            # add address
-            where = card.find('div',{'class':'property-address'}).contents[0].strip()
-            where += ', ' + card.find('div',{'class':'property-city'}).contents[0].strip()
-            address.append(where)
-            # add website link
-            link = 'https://www.century21.com' + card.find('a')['href']
-            links.append(link.replace("'", ''))
+    if html.strip():
+        soup = BeautifulSoup(html, features="html.parser")
+        prices = []
+        pending = []
+        beds = []
+        baths = []
+        ft = []
+        address = []
+        links = []
+        for card in soup.find_all('div', {'class': ['infinite-item', 'property-card']}):
+            if card.find('div',{'class':'property-address'}) is not None:
+                # add price
+                sale_price = card.find('a').contents[0]
+                prices.append(int(
+                    sale_price.replace(',','').replace("'", '').replace('$', '').strip())
+                )
+                # add if avail
+                if card.find('div', {'class':'sale-pending'}) is not None:
+                    sale_pending = card.find('div', {'class':'sale-pending'}).contents[0]
+                    pending.append(True)
+                else:
+                    pending.append(False)
+                # of beds
+                num_beds = card.find('div', {'class':'property-beds'}).contents[1].contents[0]
+                beds.append(int(num_beds))
+                # of baths
+                num_baths = card.find('div', {'class':'property-baths'}).contents[1].contents[0]
+                baths.append(int(num_baths))
+                # sq ft
+                size = card.find('div', {'class':'property-sqft'}).contents[1].contents[0]
+                ft.append(int(size.replace(",", '')))
+                # add address
+                where = card.find('div',{'class':'property-address'}).contents[0].strip()
+                where += ', ' + card.find('div',{'class':'property-city'}).contents[0].strip()
+                address.append(where)
+                # add website link
+                link = 'https://www.century21.com' + card.find('a')['href']
+                links.append(link.replace("'", ''))
 
-xl_links = []
-for each in links:
-    xl_links.append('=hyperlink("{url}","Go")'.format(url=each))
+    xl_links = []
+    for each in links:
+        xl_links.append('=hyperlink("{url}","Go")'.format(url=each))
 
-# output to csv and excel
-df = pandas.DataFrame(data={
-    "Sale Price": prices,
-    "Sale Pending":pending,
-    "Beds": beds,
-    "Baths": baths,
-    "Ft": ft,
-    "Address":address,
-    "Url": links})
-df.sort_values(by="Sale Pending", inplace=True)
-df.to_csv("./file.csv", sep=',',index=False)
-df["Url"] = xl_links
-df.to_excel("./sheet.xlsx",index=False)
-send_email()
+    # output to csv and excel
+    df = pandas.DataFrame(data={
+        "Sale Price": prices,
+        "Sale Pending":pending,
+        "Beds": beds,
+        "Baths": baths,
+        "Ft": ft,
+        "Address":address,
+        "Url": links})
+    df.to_csv("./file.csv", sep=',',index=False)
+    df["Url"] = xl_links
+    df.sort_values(by="Sale Pending", inplace=True)
+    df.to_excel("./sheet.xlsx",index=False)
+    send_email()
 
-# output_notebook()
+    # output_notebook()
 
-# p = figure(plot_width=400,plot_height=400)
+    # p = figure(plot_width=400,plot_height=400)
 
-# show(p)
+    # show(p)
+while True:
+    sleep(86400)
+    runScrape()
