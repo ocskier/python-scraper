@@ -1,7 +1,7 @@
 """ This is a module to email real estate local data"""
 import smtplib
 import ssl
-import  os
+import os
 from email.encoders import encode_base64
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
@@ -36,11 +36,10 @@ def send_email():
     part1 = MIMEText(text, "plain")
     message.attach(part1)
 
-    
     try:
         with smtplib.SMTP_SSL('smtp.gmail.com',PORT,context=context) as server:
             server.login(admin_user,password)
             server.sendmail(admin_user, receivers, message.as_string())
-            print("Successfully sent email") 
+            print("Successfully sent email")
     except smtplib.SMTPException as _e:
         print(_e)
